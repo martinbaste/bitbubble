@@ -1,51 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>Bitcoin Bubble Expected Value Calculator</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 </head>
 <body>
-<div>
-	<header>
-		<h1>Bitcoin Bubble Simulator</h1>
-	</header>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-body">
+					<h1 class="card-title">Bitcoin Bubble Simulator</h1>
+					<p>Total potential investment: $10,000</p>
+					<div>
+				    	<label><strong>Amount to invest</strong></label><br/>
+				    	<strong>$<span id="choose-invested"></span></strong><input type="range" min="0" max="100" value="30" id="choose-invest" list="tickmarks"/><strong>$<span id="choose-uninvested"></span></strong>
+				    	<span id="crashDisplay"></span>%
+				    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+			  <div class="card-body">
+			  	<h3 class="card-title">Total invested: $<span id="invested"></span></h3>
+			    <div>
+			    	<label><strong>What is the probability of a bitcoin bubble crash?</strong></label><br/>
+			    	<input type="range" min="0" max="100" value="80" id="prob" list="tickmarks"/>
+			    	<span id="probDisplay"></span>%
+			    </div>
+			    <div>
+			    	<label><strong>Price growth if there is no crash</strong></label><br/>
+			    	<select id="growth">
+			    		<option value="100">100% - No change</option>
+			    		<option value="105">105%</option>
+			    		<option value="110">110%</option>
+			    		<option value="120">120%</option>
+			    		<option value="150">150%</option>
+			    		<option value="200" selected>200%</option>
+			    		<option value="500">500%</option>
+			    		<option value="800">800%</option>
+			    		<option value="1000">1,000%</option>
+			    		<option value="2500">2,500%</option>
+			    		<option value="5000">5,000%</option>
+			    		<option value="10000">10,000%</option>
+			    	</select>
+			    </div>
+			    <div>
+			    	<label><strong>Price after crash</strong></label><br/>
+			    	<input type="range" min="0" max="100" value="30" id="crash" list="tickmarks"/>
+			    	<span id="crashDisplay"></span>%
+			    </div>
+			    <!-- <div>
+			    	<label>Investment distribution</label><br/>
+			    	<input type="range" min="0" max="100" value="50" id="split" list="tickmarks"/>
+			    	<span id="splitDisplay"></span>%
+			    </div> -->
+			    <div>
+			    	Expected profit if there is no crash: $<span id="earn"></span><br/>
+			    	Expected loss if bitcoin crashes: $<span id="loss"></span><br/>
+			    	Investment expected value: $<span id="ev"></span>  ($<span id="change"></span> <span id="profit-loss"></span>)
+			    </div>
+			  </div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<h3 class="card-title">Not invested: $0</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 
-	<div>
-		<label><strong>What is the probability of a bitcoin bubble crash?</strong></label><br/>
-		<input type="range" min="0" max="100" value="80" id="prob" list="tickmarks"/>
-		<span id="probDisplay"></span>%
-	</div>
-	<div>
-		<label><strong>Price growth if there is no crash</strong></label><br/>
-		<select id="growth">
-			<option value="100">100% - No change</option>
-			<option value="105">105%</option>
-			<option value="110">110%</option>
-			<option value="120">120%</option>
-			<option value="150">150%</option>
-			<option value="200" selected>200%</option>
-			<option value="500">500%</option>
-			<option value="800">800%</option>
-			<option value="1000">1,000%</option>
-			<option value="2500">2,500%</option>
-			<option value="5000">5,000%</option>
-			<option value="10000">10,000%</option>
-		</select>
-	</div>
-	<div>
-		<label><strong>Price after crash</strong></label><br/>
-		<input type="range" min="0" max="100" value="30" id="crash" list="tickmarks"/>
-		<span id="crashDisplay"></span>%
-	</div>
-	<!-- <div>
-		<label>Investment distribution</label><br/>
-		<input type="range" min="0" max="100" value="50" id="split" list="tickmarks"/>
-		<span id="splitDisplay"></span>%
-	</div> -->
-	<div>
-		Expected profit if there is no crash: $<span id="earn"></span><br/>
-		Expected loss if bitcoin crashes: $<span id="loss"></span><br/>
-		Expected value: $<span id="ev"></span>  ($<span id="change"></span> <span id="profit-loss"></span>)
-	</div>
 </div>
 
 <datalist id="tickmarks">
@@ -63,11 +93,14 @@
 </datalist>
 
 
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <script>
+
+	var available = 10000;
+	var inv = 10000;
+	var uninv = 0;
 
 	function setDisplay() {
 		$("#probDisplay").text($("#prob").val());
@@ -77,7 +110,6 @@
 	}
 
 	function calculateEV() {
-		var inv = 10000; //investment
 		//($("#split").val()/100)
 		var probCrash = $("#prob").val()/100;
 		var earn = (($("#growth").val()/100) * inv);
@@ -89,6 +121,7 @@
 		$("#earn").text(earn.toLocaleString('en', {useGrouping:true}));
 		$("#loss").text(loss.toLocaleString('en', {useGrouping:true}));
 		$("#ev").text(expected.toLocaleString('en', {useGrouping:true}));
+		$("#invested").text(inv.toLocaleString('en', {useGrouping:true}));
 		
 		if (change >= 0) {
 			$("#profit-loss").text("profit");
@@ -98,6 +131,14 @@
 		}
 		$("#change").text(change.toLocaleString('en', {useGrouping:true}));
 	}
+
+	$("#choose-invest").change(function(){
+		invSlider = $(this).val();
+		inv = ((100-invSlider)/100)*available;
+		uninv = available - inv;
+		$("#choose-invested").text(inv);
+		$("#choose-uninvested").text(uninv);
+	})
 
 	$("input").change(function() {setDisplay();calculateEV();});
 	$("select").change(function() {setDisplay();calculateEV();});
