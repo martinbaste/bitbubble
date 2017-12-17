@@ -13,9 +13,13 @@
 					<h1 class="card-title">Bitcoin Bubble Simulator</h1>
 					<p>Total potential investment: $10,000</p>
 					<div>
+						<svg id="chart" width="400" height="300"></svg>
+
+					</div>
+					<div>
 				    	<label><strong>Amount to invest</strong></label><br/>
 				    	<strong>$<span id="choose-invested"></span></strong><input type="range" min="0" max="100" value="30" id="choose-invest" list="tickmarks"/><strong>$<span id="choose-uninvested"></span></strong>
-				    	<span id="crashDisplay"></span>%
+				    	<span id="todo"></span>%
 				    </div>
 				</div>
 			</div>
@@ -69,7 +73,10 @@
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
-					<h3 class="card-title">Not invested: $0</h3>
+					<h3 class="card-title">Invested when the bubble pops: $<span id="uninvested"></span></h3>
+					<p>Potential value if there is no crash. $xxx</p>
+					<p>Value if invested after crash. $xxx</p>
+
 				</div>
 			</div>
 		</div>
@@ -94,6 +101,7 @@
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 <script>
@@ -122,6 +130,7 @@
 		$("#loss").text(loss.toLocaleString('en', {useGrouping:true}));
 		$("#ev").text(expected.toLocaleString('en', {useGrouping:true}));
 		$("#invested").text(inv.toLocaleString('en', {useGrouping:true}));
+		$("#uninvested").text(uninv.toLocaleString('en', {useGrouping:true}));
 		
 		if (change >= 0) {
 			$("#profit-loss").text("profit");
@@ -132,18 +141,84 @@
 		$("#change").text(change.toLocaleString('en', {useGrouping:true}));
 	}
 
-	$("#choose-invest").change(function(){
-		invSlider = $(this).val();
+	function calculateInv () {
+		invSlider = $("#choose-invest").val();
 		inv = ((100-invSlider)/100)*available;
 		uninv = available - inv;
 		$("#choose-invested").text(inv);
 		$("#choose-uninvested").text(uninv);
-	})
+	}
 
-	$("input").change(function() {setDisplay();calculateEV();});
-	$("select").change(function() {setDisplay();calculateEV();});
-	calculateEV();
-	setDisplay();
+	function graph () {
+
+		var parseTime = d3.timeParse("%d-%b-%y");
+
+		var svg = d3.select("svg"),
+		    margin = {top: 20, right: 20, bottom: 30, left: 50},
+		    width = +svg.attr("width") - margin.left - margin.right,
+		    height = +svg.attr("height") - margin.top - margin.bottom,
+		    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	    var x = d3.scaleTime()
+	        .rangeRound([0, width]);
+
+	    var y = d3.scaleLinear()
+	        .rangeRound([height, 0]);
+
+	    var line = d3.line()
+	        .x(function(d) { return x(parseTime(d.date)); })
+	        .y(function(d) { return y(d.price); });
+
+	    var data = [
+	    	{date: "17-Dec-17", price: 100},
+	    	{date: "17-Jan-18", price: 150},
+	    	{date: "17-Jun-18", price: 30},
+	    	{date: "17-Dec-18", price: 100}
+	    ];
+
+	    x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
+  		y.domain(d3.extent(data, function(d) { return d.price; }));
+
+  		g.append("g")
+		      .attr("transform", "translate(0," + height + ")")
+		      .call(d3.axisBottom(x))
+		    .select(".domain")
+		      .remove();
+
+		g.append("g")
+			  .call(d3.axisLeft(y))
+			.append("text")
+			  .attr("fill", "#000")
+			  .attr("transform", "rotate(-90)")
+			  .attr("y", 6)
+			  .attr("dy", "0.71em")
+			  .attr("text-anchor", "end")
+			  .text("Price ($)");
+
+		g.append("path")
+		      .datum(data)
+		      .attr("fill", "none")
+		      .attr("stroke", "steelblue")
+		      .attr("stroke-linejoin", "round")
+		      .attr("stroke-linecap", "round")
+		      .attr("stroke-width", 1.5)
+		      .attr("d", line);
+
+	}
+
+	function update() {
+		graph();
+		calculateInv();
+		calculateEV();
+		setDisplay();
+
+	}
+
+	//$("#choose-invest").change(update)
+
+	$("input").change(update);
+	$("select").change(update);
+	update();
 
 </script>
 </body>
