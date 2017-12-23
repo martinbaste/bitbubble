@@ -23,9 +23,9 @@
 					<li>Two things can happen here: the price crashes or keeps growing.</li>
 						<ol>
 							<li>If it crashes, it goes down to the <code>crash price</code>.</li>
-							<li>Then it goes to the <code>after-crash long term price</code>.</li>
+							<li>Then it goes to the <code>post-crash long term price</code>.</li>
 						</ol>
-						<li>If it doesn't crash, it goes to <code>post-crash long term price</code>.</li>
+						<li>If it doesn't crash, it goes to <code>no-crash long term price</code>.</li>
 					</ol>
 					<hr>
 <!-- 					<div>
@@ -37,7 +37,7 @@
 						<h3>Assumptions</h3>
 						<div>
 					    	<label><strong>Starting price</strong></label><br/>
-					    	$100
+					    	$<input type="number" min="0" value="100" id="initialPrice"/>
 					    </div>
 						<div>
 					    	<label><strong>Price crash probability</strong></label><br/>
@@ -94,11 +94,11 @@
 				<div class="card-body">
 					<h3 class="card-title">Invested during crash: $<span class="uninv"></span></h3>
 					<h4>Crash</h4>
-					<p>Value if invested after crash. $<span class="uninvCrashEV"></span></p>
+					<p>Value if invested just after crash. $<span class="uninvCrashEV"></span></p>
 					<h4>No crash</h4>
 					<p>If there is no crash, it remains uninvested. Value: $<span class="uninv"></span></p>
 					<p>Opportunity cost. Value if invested: $<span class="uninv"></span> - $<span class="uninvIfInv"></span>: $<span class="uninvNoCrashEV"></span></p>
-					<h4>EV for investment after bubble crash.</h4>
+					<h4>EV for investment just after bubble crash.</h4>
 					<p>EV crash * p crash + EV no crash * p nocrash: <span class="uninvEV"></span></p>
 				</div>
 			</div>
@@ -267,6 +267,8 @@
 
 	function updateGlobals() {
 		available = 10000;
+
+		initialPrice = $("#initialPrice").val();
 
 		var invSlider = $("#choose-invest").val();
 		inv = ((100-invSlider)/100)*available;
