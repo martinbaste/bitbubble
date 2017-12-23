@@ -11,16 +11,59 @@
 			<div class="card">
 				<div class="card-body">
 					<h1 class="card-title">Bitcoin Bubble Simulator</h1>
-					<p>Total potential investment: $10,000</p>
+					<p>This calculator was inspired by this <a href="https://medium.freecodecamp.org/are-we-in-a-cryptocurrency-bubble-a-comparison-with-the-2000-dotcom-bubble-a463d8dd8d8b" target="_blank">awesome article</a> published by Jose Maria Macedo. Good read overall, if you are short on time scroll down to the expected value section.</p>
+					<q>Given that there is evidence we’re in a bubble, and that it’s virtually impossible to time a bubble bursting, it seems wise to prepare ourselves. So what can we do? As a former professional poker player I like to think of things in terms of expected value or EV. EV is simply the sum of all possible values for a random variable, each value multiplied by its probability of occurrence</q>
+					<p>Our plan here is to learn how to use expected value (EV) for our benefit. Enter your assumptions and calculate the EV of any course of action.</p>
+					<p>I'm using Bitcoin here as our currency but of course it can be applied to anything.</p>
+					<p>Here is how it works:</p>
+					<ol>
+						<li>Bitcoin is at an arbitrary value of $100.</li>
+					<li>Two things can happen here: the price crashes or keeps growing.</li>
+						<ol>
+							<li>If it crashes, it goes down to the <code>crash price</code>.</li>
+							<li>Then it goes to the <code>after-crash long term price</code>.</li>
+						</ol>
+						<li>If it doesn't crash, it goes to <code>post-crash long term price</code>.</li>
+					</ol>
+					<hr>
 					<div>
+						<h3>Price chart</h3>
 						<svg id="chart" width="400" height="300"></svg>
 
 					</div>
 					<div>
-				    	<label><strong>Amount to invest</strong></label><br/>
-				    	<strong>$<span id="choose-invested"></span></strong><input type="range" min="0" max="100" value="30" id="choose-invest" list="tickmarks"/><strong>$<span id="choose-uninvested"></span></strong>
-				    	<span id="todo"></span>%
-				    </div>
+						<h3>Assumptions</h3>
+						<div>
+					    	<label><strong>Starting price</strong></label><br/>
+					    	$100
+					    </div>
+						<div>
+					    	<label><strong>Price crash probability</strong></label><br/>
+					    	<input type="range" min="0" max="100" value="80" id="prob" list="tickmarks"/>
+					    	<span id="probDisplay"></span>%
+					    </div>
+					    <div>
+					    	<label><strong>Crash price</strong></label><br/>
+					    	$<input type="number" value="30" id="crash"/>
+					    </div>
+					    <div>
+					    	<label><strong>Post-crash long term price</strong></label><br/>
+					    	$<input type="number" value="150" id="growth">
+					    </div>
+					    <div>
+					    	<label><strong>No-crash long term price</strong></label><br/>
+					    	$<input type="number" value="250" id="growth">
+					    </div>
+					</div>
+					<div>
+						<h3>What to do?</h3>
+						<div>
+							<p>Total potential investment: $10,000</p>
+					    	<label><strong>Amount to invest</strong></label><br/>
+					    	<strong>$<span id="choose-invested"></span></strong><input type="range" min="0" max="100" value="30" id="choose-invest" list="tickmarks"/><strong>$<span id="choose-uninvested"></span></strong>
+					    	<span id="todo"></span>%
+					    </div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -30,33 +73,7 @@
 			<div class="card">
 			  <div class="card-body">
 			  	<h3 class="card-title">Total invested: $<span id="invested"></span></h3>
-			    <div>
-			    	<label><strong>What is the probability of a bitcoin bubble crash?</strong></label><br/>
-			    	<input type="range" min="0" max="100" value="80" id="prob" list="tickmarks"/>
-			    	<span id="probDisplay"></span>%
-			    </div>
-			    <div>
-			    	<label><strong>Price growth if there is no crash</strong></label><br/>
-			    	<select id="growth">
-			    		<option value="100">100% - No change</option>
-			    		<option value="105">105%</option>
-			    		<option value="110">110%</option>
-			    		<option value="120">120%</option>
-			    		<option value="150">150%</option>
-			    		<option value="200" selected>200%</option>
-			    		<option value="500">500%</option>
-			    		<option value="800">800%</option>
-			    		<option value="1000">1,000%</option>
-			    		<option value="2500">2,500%</option>
-			    		<option value="5000">5,000%</option>
-			    		<option value="10000">10,000%</option>
-			    	</select>
-			    </div>
-			    <div>
-			    	<label><strong>Price after crash</strong></label><br/>
-			    	<input type="range" min="0" max="100" value="30" id="crash" list="tickmarks"/>
-			    	<span id="crashDisplay"></span>%
-			    </div>
+
 			    <!-- <div>
 			    	<label>Investment distribution</label><br/>
 			    	<input type="range" min="0" max="100" value="50" id="split" list="tickmarks"/>
@@ -73,10 +90,25 @@
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
-					<h3 class="card-title">Invested when the bubble pops: $<span id="uninvested"></span></h3>
-					<p>Potential value if there is no crash. $xxx</p>
-					<p>Value if invested after crash. $xxx</p>
-
+					<h3 class="card-title">Invested during crash: $<span class="uninvested"></span></h3>
+					<h4>Crash</h4>
+					<p>Value if invested after crash. $aaa</p>
+					<h4>No crash</h4>
+					<p>If there is no crash, it remains uninvested. Value: $<span class="uninvested"></span></p>
+					<p>Cost of opportunity. Value if invested: $aaa - $<span class="uninvested"></span>: $bbb</p>
+					<h4>EV for investment after bubble crash.</h4>
+					<p>EV crash * p crash + EV no crash * p nocrash: xxx</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-body">
+					<h2>Final Expected Value</h2>
+					<p>EV initial investment + EV crash investment</p>
+					<p class="h3">$12.000</p>
 				</div>
 			</div>
 		</div>
@@ -130,7 +162,7 @@
 		$("#loss").text(loss.toLocaleString('en', {useGrouping:true}));
 		$("#ev").text(expected.toLocaleString('en', {useGrouping:true}));
 		$("#invested").text(inv.toLocaleString('en', {useGrouping:true}));
-		$("#uninvested").text(uninv.toLocaleString('en', {useGrouping:true}));
+		$(".uninvested").text(uninv.toLocaleString('en', {useGrouping:true}));
 		
 		if (change >= 0) {
 			$("#profit-loss").text("profit");
