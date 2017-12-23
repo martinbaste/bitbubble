@@ -95,7 +95,7 @@
 					<p>Value if invested after crash. $<span class="uninvCrashEV"></span></p>
 					<h4>No crash</h4>
 					<p>If there is no crash, it remains uninvested. Value: $<span class="uninv"></span></p>
-					<p>Opportunity cost. Value if invested: $<span class="uninvIfInv"></span> - $<span class="uninv"></span>: $<span class="uninvNoCrashEV"></span></p>
+					<p>Opportunity cost. Value if invested: $<span class="uninv"></span> - $<span class="uninvIfInv"></span>: $<span class="uninvNoCrashEV"></span></p>
 					<h4>EV for investment after bubble crash.</h4>
 					<p>EV crash * p crash + EV no crash * p nocrash: <span class="uninvEV"></span></p>
 				</div>
@@ -184,7 +184,7 @@
 		uninvCrashEV = boughtPostCrash * postCrashLongTermPrice;
 
 		uninvIfInv = (uninv/initialPrice) * noCrashLongTermPrice;
-		uninvNoCrashEV = uninvIfInv - uninv;
+		uninvNoCrashEV = uninv - uninvIfInv;
 
 		uninvEV = uninvCrashEV * probCrash + uninvNoCrashEV * (1 - probCrash);
 
