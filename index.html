@@ -50,11 +50,11 @@
 					    </div>
 					    <div>
 					    	<label><strong>Post-crash long term price</strong></label><br/>
-					    	$<input type="number" value="150" id="postCrashLongTermPrice">
+					    	$<input type="number" value="1500" id="postCrashLongTermPrice">
 					    </div>
 					    <div>
 					    	<label><strong>No-crash long term price</strong></label><br/>
-					    	$<input type="number" value="250" id="noCrashLongTermPrice">
+					    	$<input type="number" value="2500" id="noCrashLongTermPrice">
 					    </div>
 					</div>
 					<div>
@@ -74,7 +74,7 @@
 		<div class="col-md-6">
 			<div class="card">
 			  <div class="card-body">
-			  	<h3 class="card-title">Total invested: $<span class="inv"></span></h3>
+			  	<h2 class="card-title">Initial investent: $<span class="inv"></span></h2>
 
 			    <!-- <div>
 			    	<label>Investment distribution</label><br/>
@@ -82,9 +82,11 @@
 			    	<span id="splitDisplay"></span>%
 			    </div> -->
 			    <div>
-			    	Expected profit if there is no crash: $<span class="invNoCrashEV"></span><br/>
-			    	Expected loss if bitcoin crashes: $<span class="invCrashEV"></span><br/>
-			    	Investment expected value: $<span class="invEV"></span>  ($<span class="invChange"></span>)
+			    	Expected value if there is no crash: $<span class="invNoCrashEV"></span><br/>
+			    	Expected value if bitcoin crashes: $<span class="invCrashEV"></span><br/>
+			    	Investment Expected Value: <br/>
+			    	<span class="probNoCrashDec"></span> * $<span class="invNoCrashEV"></span> + <span class="probCrashDec"></span> * $<span class="invCrashEV"></span> =<br/>
+			    	<span class="h3">EV: $<span class="invEV"></span></span> (<span class="invChange"></span> change)
 			    </div>
 			  </div>
 			</div>
@@ -92,14 +94,14 @@
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
-					<h3 class="card-title">Invested during crash: $<span class="uninv"></span></h3>
-					<h4>Crash</h4>
-					<p>Value if invested just after crash. $<span class="uninvCrashEV"></span></p>
-					<h4>No crash</h4>
-					<p>If there is no crash, it remains uninvested. Value: $<span class="uninv"></span></p>
-					<p>Opportunity cost. Value if invested: $<span class="uninv"></span> - $<span class="uninvIfInv"></span>: $<span class="uninvNoCrashEV"></span></p>
+					<h2 class="card-title">Crash investment: $<span class="uninv"></span></h2>
+					<p><strong>Crash:</strong> Value if invested just after crash. $<span class="uninvCrashEV"></span></p>
+					<p><strong>No crash:</strong> If there is no crash, it remains uninvested. Value: $<span class="uninv"></span></p>
+					<!-- <p>Opportunity cost. Value if invested: $<span class="uninv"></span> - $<span class="uninvIfInv"></span>: $<span class="uninvNoCrashEV"></span></p> -->
+					
 					<h4>EV for investment just after bubble crash.</h4>
-					<p>EV crash * p crash + EV no crash * p nocrash: <span class="uninvEV"></span></p>
+					<p><span class="probNoCrashDec"></span> * $<span class="uninvNoCrashEV"></span> + <span class="probCrashDec"></span> * $<span class="uninvCrashEV"></span> =<br/>
+			    	<span class="h3">EV: $<span class="uninvEV h3"></span></span> (<span class="uninvChange"></span> change)</p>
 				</div>
 			</div>
 		</div>
@@ -108,9 +110,9 @@
 		<div class="col-md-12">
 			<div class="card">
 				<div class="card-body">
-					<h2>Final Expected Value</h2>
-					<p>EV initial investment + EV crash investment</p>
-					<p class="h3">$<span class="finalEV"></span></p>
+					<h2>Expected Value</h2>
+					<p>$<span class="invEV"></span>(initial investment EV) + $<span class="uninvEV"></span>(crash investment EV)</p>
+					<p><span class="h3">$<span class="finalEV"></span></span> (<span class="finalChange"></span> change)</p>
 					<p>Final value if there is no crash (<span class="probNoCrash"></span>%): $<span class="finalNoCrashEV"></span></p>
 					<p>Final value if there is crash (<span class="probCrash"></span>%): $<span class="finalCrashEV"></span></p>
 				</div>
@@ -146,9 +148,17 @@
 	var uninvNoCrashEV = 0;
 	var uninvEV = 0;
 
+	//Rounds to two decimals and adds us$ format
+	function m(value) {
+		return (Math.round(value*100)/100).toLocaleString('en', {useGrouping:true});
+	}
+
+
 	function setDisplay() {
 		$(".probCrash").text(probCrash * 100);
 		$(".probNoCrash").text(probNoCrash * 100);
+		$(".probCrashDec").text(probCrash);
+		$(".probNoCrashDec").text(probNoCrash);
 		$("#growthDisplay").text($("#growth").val());
 		$("#crashDisplay").text($("#crash").val());
 		$("#splitDisplay").text($("#split").val());
@@ -160,40 +170,47 @@
 
 		invNoCrashEV = noCrashLongTermPrice * initialBought;
 
-		invCrashEV = crashPrice * initialBought;
+		invCrashEV = postCrashLongTermPrice * initialBought;
 
 		invEV = (invNoCrashEV * (1 - probCrash)) + (invCrashEV * probCrash);
 
 		var invChange = invEV - inv;
 
-		$(".invNoCrashEV").text(invNoCrashEV.toLocaleString('en', {useGrouping:true}));
-		$(".invCrashEV").text(invCrashEV.toLocaleString('en', {useGrouping:true}));
-		$(".invEV").text(invEV.toLocaleString('en', {useGrouping:true}));
-		$(".inv").text(inv.toLocaleString('en', {useGrouping:true}));
-		$(".uninv").text(uninv.toLocaleString('en', {useGrouping:true}));
-		
-		/*if (invChange >= 0) {
-			$("#profit-loss").text("profit");
+		if (invChange >= 0) {
+			invChange = '+$' + m(invChange);
 		} else {
-			invChange = -invChange;
-			$("#profit-loss").text("loss");
-		}*/
-		$(".invChange").text(invChange.toLocaleString('en', {useGrouping:true}));
+			invChange = '-$' + m(invChange);
+		}
+
+		$(".invNoCrashEV").text(m(invNoCrashEV));
+		$(".invCrashEV").text(m(invCrashEV));
+		$(".invEV").text(m(invEV));
+		$(".inv").text(m(inv));
+		$(".uninv").text(m(uninv));
+		
+		$(".invChange").text(invChange); //Already formatted
 	}
 
 	function populateUninv() {
 		var boughtPostCrash = uninv / crashPrice;
 		uninvCrashEV = boughtPostCrash * postCrashLongTermPrice;
 
-		uninvIfInv = (uninv/initialPrice) * noCrashLongTermPrice;
-		uninvNoCrashEV = uninv - uninvIfInv;
+		uninvNoCrashEV = boughtPostCrash * noCrashLongTermPrice;
 
 		uninvEV = uninvCrashEV * probCrash + uninvNoCrashEV * (1 - probCrash);
 
-		$(".uninvCrashEV").text(uninvCrashEV.toLocaleString('en', {useGrouping:true}));
-		$(".uninvIfInv").text(uninvIfInv.toLocaleString('en', {useGrouping:true}));
-		$(".uninvNoCrashEV").text(uninvNoCrashEV.toLocaleString('en', {useGrouping:true}));
-		$(".uninvEV").text(uninvEV.toLocaleString('en', {useGrouping:true}));
+		var uninvChange = uninvEV - uninv;
+
+		if (uninvChange >= 0) {
+			uninvChange = '+$' + m(uninvChange);
+		} else {
+			uninvChange = '-$' + m(uninvChange);
+		}
+
+		$(".uninvCrashEV").text(m(uninvCrashEV));
+		$(".uninvNoCrashEV").text(m(uninvNoCrashEV));
+		$(".uninvEV").text(m(uninvEV));
+		$(".uninvChange").text(uninvChange);
 
 	}
 
@@ -203,9 +220,18 @@
 		var finalCrashEV = invCrashEV + uninvCrashEV;
 		var finalNoCrashEV = invNoCrashEV + uninvNoCrashEV;
 
-		$(".finalEV").text(finalEV.toLocaleString('en', {useGrouping:true}));
-		$(".finalCrashEV").text(finalCrashEV.toLocaleString('en', {useGrouping:true}));
-		$(".finalNoCrashEV").text(finalNoCrashEV.toLocaleString('en', {useGrouping:true}));
+		var finalChange = finalEV - available;
+
+		if (finalChange >= 0) {
+			finalChange = '+$' + m(finalChange);
+		} else {
+			finalChange = '-$' + m(finalChange);
+		}
+
+		$(".finalEV").text(m(finalEV));
+		$(".finalCrashEV").text(m(finalCrashEV));
+		$(".finalNoCrashEV").text(m(finalNoCrashEV));
+		$(".finalChange").text(finalChange); //Already formatted
 	}
 
 	function graph () {
