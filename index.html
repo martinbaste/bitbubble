@@ -3,6 +3,12 @@
 <head>
 	<title>Bitcoin Bubble Expected Value Calculator</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css">
+	<style type="text/css">
+		.slider.slider-horizontal:hover .tooltip.tooltip-main, .slider.slider-vertical:hover .tooltip.tooltip-main {
+		  opacity: 1 !important;
+		}
+	</style>
 </head>
 <body>
 <div class="container">
@@ -19,51 +25,68 @@
 					<p>I'm using Bitcoin here as our currency but of course it can be applied to anything.</p>
 					<p>Here is how it works:</p>
 					<ol>
-						<li>Bitcoin is at an arbitrary value of $100.</li>
-					<li>Two things can happen here: the price crashes or keeps growing.</li>
-						<ol>
-							<li>If it crashes, it goes down to the <code>crash price</code>.</li>
-							<li>Then it goes to the <code>post-crash long term price</code>.</li>
-						</ol>
-						<li>If it doesn't crash, it goes to <code>no-crash long term price</code>.</li>
+						<li>Bitcoin starts at <code>initial price</code>. You can invest a % of the initial investment here. After this, two things can happen: the price crashes or keeps growing.</li>
 					</ol>
-					<hr>
-<!-- 					<div>
-						<h3>Price chart</h3>
-						<svg id="chart" width="400" height="300"></svg>
-
-					</div> -->
+					<p><strong>Price crashes</strong></p>
+					<ol start="2">
+						<li>If it crashes, it goes down to the <code>crash price</code>. The rest of the initial investment is invested here.</li>
+						<li>Then it goes to the <code>post-crash long-term price</code>.</li>
+					</ol>
+					<p><strong>Price doesnt crash</strong></p>
+					<ol start="2">
+						<li>If it doesn't crash, it goes to <code>no crash long-term price</code>. The rest of the initial investment stays uninvested.</li>
+					</ol>
 					<div>
 						<h3>Assumptions</h3>
-						<div>
-					    	<label><strong>Starting price</strong></label><br/>
-					    	$<input type="number" min="0" value="1500" id="initialPrice"/>
-					    </div>
-						<div>
-					    	<label><strong>Price crash probability</strong></label><br/>
-					    	<input type="range" min="0" max="100" value="80" id="probCrash" list="tickmarks"/>
-					    	<span class="probCrash"></span>%
-					    </div>
-					    <div>
-					    	<label><strong>Crash price</strong></label><br/>
-					    	$<input type="number" value="30" id="crashPrice"/>
-					    </div>
-					    <div>
-					    	<label><strong>Post-crash long term price</strong></label><br/>
-					    	$<input type="number" value="1500" id="postCrashLongTermPrice">
-					    </div>
-					    <div>
-					    	<label><strong>No-crash long term price</strong></label><br/>
-					    	$<input type="number" value="2500" id="noCrashLongTermPrice">
-					    </div>
+						<div class="form-row">
+							<div class="col-md-3">
+								<div class="form-group">
+							    	<label>Starting price</label>
+							    	<div class="input-group">
+								    	<span class="input-group-addon">$</span><input type="number" class="form-control" min="0" value="15000" id="initialPrice"/>
+								    </div>
+							    </div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+						        	<label>Price crash probability</label>
+						        	<input id="probCrash" data-slider-id='probCrashSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="80"/>
+						        </div>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="col-md-3">
+								<div class="form-group">
+						        	<label>Crash price</label>
+						        	<div class="input-group">
+						    	    	<span class="input-group-addon">$</span><input class="form-control" type="number" value="3000" id="crashPrice"/>
+						    	    </div>
+						        </div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+							    	<label>Post-crash long-term price</label>
+							    	<div class="input-group">
+								    	<span class="input-group-addon">$</span><input class="form-control" type="number" value="15000" id="postCrashLongTermPrice">
+								    </div>
+							    </div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+						        	<label>No crash long-term price</label>
+						        	<div class="input-group">
+						    	    	<span class="input-group-addon">$</span><input class="form-control" type="number" value="25000" id="noCrashLongTermPrice">
+						    	    </div>
+						        </div>
+							</div>			
+						</div>
 					</div>
 					<div>
 						<h3>What to do?</h3>
 						<div>
 							<p>Total potential investment: $10,000</p>
-					    	<label><strong>Amount to invest</strong></label><br/>
-					    	<strong>$<span class="inv"></span></strong><input type="range" min="0" max="100" value="30" id="choose-invest" list="tickmarks"/><strong>$<span class="uninv"></span></strong>
-					    	<span id="todo"></span>
+					    	<label><strong>Amount to invest initially</strong></label><br/>
+					    	<input id="choose-invest" data-slider-id='choose-investSlider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="30"/>
 					    </div>
 					</div>
 				</div>
@@ -73,35 +96,25 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="card">
-			  <div class="card-body">
-			  	<h2 class="card-title">Initial investent: $<span class="inv"></span></h2>
-
-			    <!-- <div>
-			    	<label>Investment distribution</label><br/>
-			    	<input type="range" min="0" max="100" value="50" id="split" list="tickmarks"/>
-			    	<span id="splitDisplay"></span>%
-			    </div> -->
-			    <div>
-			    	Expected value if there is no crash: $<span class="invNoCrashEV"></span><br/>
-			    	Expected value if bitcoin crashes: $<span class="invCrashEV"></span><br/>
-			    	Investment Expected Value: <br/>
-			    	<span class="probNoCrashDec"></span> * $<span class="invNoCrashEV"></span> + <span class="probCrashDec"></span> * $<span class="invCrashEV"></span> =<br/>
-			    	<span class="h3">EV: $<span class="invEV"></span></span> (<span class="invChange"></span> change)
-			    </div>
-			  </div>
+			  	<div class="card-body">
+			  		<h2 class="card-title">Initial investment: <span class="inv"></span></h2>
+			    	<p><strong>Crash:</strong> Value if price crashes: <span class="invCrashEV"></span></p>
+			    	<p><strong>No crash:</strong> Value if there is no crash: <span class="invNoCrashEV"></span></p>
+			    	<p>Investment Expected Value:</p>
+			    	<p><span class="probNoCrashDec"></span> * <span class="invNoCrashEV"></span> + <span class="probCrashDec"></span> * <span class="invCrashEV"></span> =</p>
+			    	<p><span class="h4">EV: <span class="invEV"></span></span> (<span class="invChange"></span> change)</p>
+			 	</div>
 			</div>
 		</div>
 		<div class="col-md-6">
 			<div class="card">
 				<div class="card-body">
-					<h2 class="card-title">Crash investment: $<span class="uninv"></span></h2>
-					<p><strong>Crash:</strong> Value if invested just after crash. $<span class="uninvCrashEV"></span></p>
-					<p><strong>No crash:</strong> If there is no crash, it remains uninvested. Value: $<span class="uninv"></span></p>
-					<!-- <p>Opportunity cost. Value if invested: $<span class="uninv"></span> - $<span class="uninvIfInv"></span>: $<span class="uninvNoCrashEV"></span></p> -->
-					
-					<h4>EV for investment just after bubble crash.</h4>
-					<p><span class="probNoCrashDec"></span> * $<span class="uninvNoCrashEV"></span> + <span class="probCrashDec"></span> * $<span class="uninvCrashEV"></span> =<br/>
-			    	<span class="h3">EV: $<span class="uninvEV h3"></span></span> (<span class="uninvChange"></span> change)</p>
+					<h2 class="card-title">After crash investment: <span class="uninv"></span></h2>
+					<p><strong>Crash:</strong> Value if invested just after crash. <span class="uninvCrashEV"></span></p>
+					<p><strong>No crash:</strong> If there is no crash, it remains uninvested: <span class="uninv"></span></p>				
+					<p>EV for investment made just after bubble crash:<br/>
+					<p><span class="probNoCrashDec"></span> * <span class="uninvNoCrashEV"></span> + <span class="probCrashDec"></span> * <span class="uninvCrashEV"></span> =</p>
+			    	<p><span class="h4">EV: <span class="uninvEV"></span></span> (<span class="uninvChange"></span> change)</p>
 				</div>
 			</div>
 		</div>
@@ -110,11 +123,11 @@
 		<div class="col-md-12">
 			<div class="card">
 				<div class="card-body">
-					<h2>Expected Value</h2>
-					<p>$<span class="invEV"></span>(initial investment EV) + $<span class="uninvEV"></span>(crash investment EV)</p>
-					<p><span class="h3">$<span class="finalEV"></span></span> (<span class="finalChange"></span> change)</p>
-					<p>Final value if there is no crash (<span class="probNoCrash"></span>%): $<span class="finalNoCrashEV"></span></p>
-					<p>Final value if there is crash (<span class="probCrash"></span>%): $<span class="finalCrashEV"></span></p>
+					<h2>Total Expected Value</h2>
+					<p><span class="invEV"></span> (initial investment EV) + <span class="uninvEV"></span> (crash investment EV) =</p>
+					<p><span class="h3"><span class="finalEV"></span></span> (<span class="finalChange"></span> change)</p>
+					<p>Final value if there is no crash (<span class="probNoCrash"></span>%): <span class="finalNoCrashEV"></span></p>
+					<p>Final value if there is crash (<span class="probCrash"></span>%): <span class="finalCrashEV"></span></p>
 				</div>
 			</div>
 		</div>
@@ -126,204 +139,223 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
 <script>
+	$(function() {
 
-	var available = 10000;
-	var initialPrice = 100;
-	var inv = 10000;
-	var uninv = 0;
+		var available = 10000;
+		var initialPrice = 100;
+		var inv = 10000;
+		var uninv = 0;
+		var beforeCrashPrice = 0;
 
-	var probCrash = 0;
-	var probNoCrash = 0;
+		var probCrash = 0;
+		var probNoCrash = 0;
 
-	var crashPrice = 0;
-	var postCrashLongTermPrice = 0;
-	var noCrashLongTermPrice = 0;
+		var crashPrice = 0;
+		var postCrashLongTermPrice = 0;
+		var noCrashLongTermPrice = 0;
 
-	var invCrashEV = 0;
-	var invNoCrashEV = 0;
-	var invEV = 0;
+		var invCrashEV = 0;
+		var invNoCrashEV = 0;
+		var invEV = 0;
 
-	var uninvCrashEV = 0;
-	var uninvNoCrashEV = 0;
-	var uninvEV = 0;
+		var uninvCrashEV = 0;
+		var uninvNoCrashEV = 0;
+		var uninvEV = 0;
 
-	//Rounds to two decimals and adds us$ format
-	function m(value) {
-		return (Math.round(value*100)/100).toLocaleString('en', {useGrouping:true});
-	}
-
-
-	function setDisplay() {
-		$(".probCrash").text(probCrash * 100);
-		$(".probNoCrash").text(probNoCrash * 100);
-		$(".probCrashDec").text(probCrash);
-		$(".probNoCrashDec").text(probNoCrash);
-		$("#growthDisplay").text($("#growth").val());
-		$("#crashDisplay").text($("#crash").val());
-		$("#splitDisplay").text($("#split").val());
-	}
-
-	function populateInv () {
-
-		var initialBought = inv / initialPrice;
-
-		invNoCrashEV = noCrashLongTermPrice * initialBought;
-
-		invCrashEV = postCrashLongTermPrice * initialBought;
-
-		invEV = (invNoCrashEV * (1 - probCrash)) + (invCrashEV * probCrash);
-
-		var invChange = invEV - inv;
-
-		if (invChange >= 0) {
-			invChange = '+$' + m(invChange);
-		} else {
-			invChange = '-$' + m(invChange);
+		//Rounds to two decimals and adds us$ format
+		function m(value) {
+			return value.toLocaleString('en', {
+				style: 'currency',
+				currency: 'USD'
+			});
 		}
 
-		$(".invNoCrashEV").text(m(invNoCrashEV));
-		$(".invCrashEV").text(m(invCrashEV));
-		$(".invEV").text(m(invEV));
-		$(".inv").text(m(inv));
-		$(".uninv").text(m(uninv));
-		
-		$(".invChange").text(invChange); //Already formatted
-	}
 
-	function populateUninv() {
-		var boughtPostCrash = uninv / crashPrice;
-		uninvCrashEV = boughtPostCrash * postCrashLongTermPrice;
-
-		uninvNoCrashEV = boughtPostCrash * noCrashLongTermPrice;
-
-		uninvEV = uninvCrashEV * probCrash + uninvNoCrashEV * (1 - probCrash);
-
-		var uninvChange = uninvEV - uninv;
-
-		if (uninvChange >= 0) {
-			uninvChange = '+$' + m(uninvChange);
-		} else {
-			uninvChange = '-$' + m(uninvChange);
+		function setDisplay() {
+			$(".probCrash").text(probCrash * 100);
+			$(".probNoCrash").text(probNoCrash * 100);
+			$(".probCrashDec").text(probCrash);
+			$(".probNoCrashDec").text(probNoCrash);
+			$("#growthDisplay").text($("#growth").val());
+			$("#crashDisplay").text($("#crash").val());
+			$("#splitDisplay").text($("#split").val());
 		}
 
-		$(".uninvCrashEV").text(m(uninvCrashEV));
-		$(".uninvNoCrashEV").text(m(uninvNoCrashEV));
-		$(".uninvEV").text(m(uninvEV));
-		$(".uninvChange").text(uninvChange);
+		function populateInv () {
 
-	}
+			var initialBought = inv / initialPrice;
 
-	function populateFinal() {
-		var finalEV = invEV + uninvEV;
+			invNoCrashEV = noCrashLongTermPrice * initialBought;
 
-		var finalCrashEV = invCrashEV + uninvCrashEV;
-		var finalNoCrashEV = invNoCrashEV + uninvNoCrashEV;
+			invCrashEV = postCrashLongTermPrice * initialBought;
 
-		var finalChange = finalEV - available;
+			invEV = (invNoCrashEV * (1 - probCrash)) + (invCrashEV * probCrash);
 
-		if (finalChange >= 0) {
-			finalChange = '+$' + m(finalChange);
-		} else {
-			finalChange = '-$' + m(finalChange);
+			var invChange = invEV - inv;
+
+			if (invChange >= 0) {
+				invChange = '+' + m(invChange);
+			} else {
+				invChange = '-' + m(invChange);
+			}
+
+			$(".invNoCrashEV").text(m(invNoCrashEV));
+			$(".invCrashEV").text(m(invCrashEV));
+			$(".invEV").text(m(invEV));
+			$(".inv").text(m(inv));
+			$(".uninv").text(m(uninv));
+			
+			$(".invChange").text(invChange); //Already formatted
 		}
 
-		$(".finalEV").text(m(finalEV));
-		$(".finalCrashEV").text(m(finalCrashEV));
-		$(".finalNoCrashEV").text(m(finalNoCrashEV));
-		$(".finalChange").text(finalChange); //Already formatted
-	}
+		function populateUninv() {
+			var boughtPostCrash = uninv / crashPrice;
+			uninvCrashEV = boughtPostCrash * postCrashLongTermPrice;
 
-	function graph () {
+			uninvNoCrashEV = uninv;
 
-		var parseTime = d3.timeParse("%d-%b-%y");
+			uninvEV = uninvCrashEV * probCrash + uninvNoCrashEV * (1 - probCrash);
 
-		var svg = d3.select("svg"),
-		    margin = {top: 20, right: 20, bottom: 30, left: 50},
-		    width = +svg.attr("width") - margin.left - margin.right,
-		    height = +svg.attr("height") - margin.top - margin.bottom,
-		    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			var uninvChange = uninvEV - uninv;
 
-	    var x = d3.scaleTime()
-	        .rangeRound([0, width]);
+			if (uninvChange >= 0) {
+				uninvChange = '+' + m(uninvChange);
+			} else {
+				uninvChange = '-' + m(uninvChange);
+			}
 
-	    var y = d3.scaleLinear()
-	        .rangeRound([height, 0]);
+			$(".uninvCrashEV").text(m(uninvCrashEV));
+			$(".uninvNoCrashEV").text(m(uninvNoCrashEV));
+			$(".uninvEV").text(m(uninvEV));
+			$(".uninvChange").text(uninvChange);
 
-	    var line = d3.line()
-	        .x(function(d) { return x(parseTime(d.date)); })
-	        .y(function(d) { return y(d.price); });
+		}
 
-	    var data = [
-	    	{date: "17-Dec-17", price: 100},
-	    	{date: "17-Jan-18", price: 150},
-	    	{date: "17-Jun-18", price: 30},
-	    	{date: "17-Dec-18", price: 100}
-	    ];
+		function populateFinal() {
+			var finalEV = invEV + uninvEV;
 
-	    x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
-  		y.domain(d3.extent(data, function(d) { return d.price; }));
+			var finalCrashEV = invCrashEV + uninvCrashEV;
+			var finalNoCrashEV = invNoCrashEV + uninvNoCrashEV;
 
-  		g.append("g")
-		      .attr("transform", "translate(0," + height + ")")
-		      .call(d3.axisBottom(x))
-		    .select(".domain")
-		      .remove();
+			var finalChange = finalEV - available;
 
-		g.append("g")
-			  .call(d3.axisLeft(y))
-			.append("text")
-			  .attr("fill", "#000")
-			  .attr("transform", "rotate(-90)")
-			  .attr("y", 6)
-			  .attr("dy", "0.71em")
-			  .attr("text-anchor", "end")
-			  .text("Price ($)");
+			if (finalChange >= 0) {
+				finalChange = '+' + m(finalChange);
+			} else {
+				finalChange = '-' + m(finalChange);
+			}
 
-		g.append("path")
-		      .datum(data)
-		      .attr("fill", "none")
-		      .attr("stroke", "steelblue")
-		      .attr("stroke-linejoin", "round")
-		      .attr("stroke-linecap", "round")
-		      .attr("stroke-width", 1.5)
-		      .attr("d", line);
+			$(".finalEV").text(m(finalEV));
+			$(".finalCrashEV").text(m(finalCrashEV));
+			$(".finalNoCrashEV").text(m(finalNoCrashEV));
+			$(".finalChange").text(finalChange); //Already formatted
+		}
 
-	}
+		function graph () {
 
-	function updateGlobals() {
-		available = 10000;
+			var parseTime = d3.timeParse("%d-%b-%y");
 
-		initialPrice = $("#initialPrice").val();
+			var svg = d3.select("svg"),
+			    margin = {top: 20, right: 20, bottom: 30, left: 50},
+			    width = +svg.attr("width") - margin.left - margin.right,
+			    height = +svg.attr("height") - margin.top - margin.bottom,
+			    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-		var invSlider = $("#choose-invest").val();
-		inv = ((100-invSlider)/100)*available;
-		uninv = available - inv;
+		    var x = d3.scaleTime()
+		        .rangeRound([0, width]);
 
-		probCrash = Math.round($("#probCrash").val())/100;
-		probNoCrash = Math.round(100 - $("#probCrash").val())/100;
+		    var y = d3.scaleLinear()
+		        .rangeRound([height, 0]);
 
-		crashPrice = $("#crashPrice").val();
-		postCrashLongTermPrice = $("#postCrashLongTermPrice").val();
-		noCrashLongTermPrice = $("#noCrashLongTermPrice").val();
-	}
+		    var line = d3.line()
+		        .x(function(d) { return x(parseTime(d.date)); })
+		        .y(function(d) { return y(d.price); });
 
-	function update() {
-		updateGlobals();
-		//graph();
-		populateInv();
-		populateUninv();
-		populateFinal();
-		setDisplay();
+		    var data = [
+		    	{date: "17-Dec-17", price: 100},
+		    	{date: "17-Jan-18", price: 150},
+		    	{date: "17-Jun-18", price: 30},
+		    	{date: "17-Dec-18", price: 100}
+		    ];
 
-	}
+		    x.domain(d3.extent(data, function(d) { return parseTime(d.date); }));
+	  		y.domain(d3.extent(data, function(d) { return d.price; }));
 
-	//$("#choose-invest").change(update)
+	  		g.append("g")
+			      .attr("transform", "translate(0," + height + ")")
+			      .call(d3.axisBottom(x))
+			    .select(".domain")
+			      .remove();
 
-	$("input").change(update);
-	$("select").change(update);
-	update();
+			g.append("g")
+				  .call(d3.axisLeft(y))
+				.append("text")
+				  .attr("fill", "#000")
+				  .attr("transform", "rotate(-90)")
+				  .attr("y", 6)
+				  .attr("dy", "0.71em")
+				  .attr("text-anchor", "end")
+				  .text("Price ($)");
 
+			g.append("path")
+			      .datum(data)
+			      .attr("fill", "none")
+			      .attr("stroke", "steelblue")
+			      .attr("stroke-linejoin", "round")
+			      .attr("stroke-linecap", "round")
+			      .attr("stroke-width", 1.5)
+			      .attr("d", line);
+
+		}
+
+		function updateGlobals() {
+			available = 10000;
+
+			initialPrice = $("#initialPrice").val();
+
+			beforeCrashPrice = $("#initialPrice").val();
+
+			var invSlider = $("#choose-invest").val();
+			inv = (invSlider/100)*available;
+			uninv = available - inv;
+
+			probCrash = Math.round($("#probCrash").val())/100;
+			probNoCrash = Math.round(100 - $("#probCrash").val())/100;
+
+			crashPrice = $("#crashPrice").val();
+			postCrashLongTermPrice = $("#postCrashLongTermPrice").val();
+			noCrashLongTermPrice = $("#noCrashLongTermPrice").val();
+		}
+
+		function update() {
+			updateGlobals();
+			//graph();
+			populateInv();
+			populateUninv();
+			populateFinal();
+			setDisplay();
+
+		}
+
+		$('#probCrash').slider({
+			formatter: function(value) {
+				return value + '%';
+			}
+		});
+		$('#choose-invest').slider({
+			formatter: function(value) {
+				return value + '%';
+			}
+		});
+
+		//$("#choose-invest").change(update)
+
+		$("input").change(update);
+		$("select").change(update);
+		update();
+	})
 </script>
 </body>
 </html>
